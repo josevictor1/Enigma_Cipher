@@ -1,6 +1,6 @@
 import random
 
-S = 100 # Alfabeto de 10 numeros
+S = 10  # Alfabeto de 10 numeros
 
 
 def createRandomVector(n):
@@ -19,6 +19,8 @@ def myindex(k,l, element):
         count = count + 1
         #print "valor de cout:",count
         #print "valor comparado:",l[(k+i)%length]
+
+
 
 class rotor:
 
@@ -60,6 +62,13 @@ class rotor:
         return aux
 
 
+    def minuslist(self):
+
+        for i in range(len(self.r)):
+            if self.r[i] > 0:
+                self.r[i] = self.r[i] - 1
+            else:
+                self.r[i]= len(self.r) - 1
 
 
 class enigma:
@@ -76,24 +85,27 @@ class enigma:
     def ecifra(self,x):
         aux = self.rotors[0].cifra(x)
         self.rotors[0].rot()
+        self.rotors[0].minuslist()
         flag = self.rotors[0].stepNext()
         #print " "
         #print self.rotors[0].r
         #print "cifra rotor 0: ", aux
 
-        for i in range(1,len(self.rotors)):
-            #print self.rotors[i].r
+        if len(self.rotors) > 1:
+            for i in range(1,len(self.rotors)):
+                #print self.rotors[i].r
 
-            if flag == True:
-                #print "passou"
-                self.rotors[i].rot()
-                flag = self.rotors[i].stepNext()
+                if flag == True:
+                    #print "passou"
+                    self.rotors[i].rot()
+                    self.rotors[i].minuslist()
+                    flag = self.rotors[i].stepNext()
 
-            #print "rotor:", i, "entrada:", aux
-            aux = self.rotors[i].cifra(aux)
-            #print "cifra rotor", i,":",aux
-            #print "rotor:", i, "resultado:", aux
-            #print " "
+                #print "rotor:", i, "entrada:", aux
+                aux = self.rotors[i].cifra(aux)
+                #print "cifra rotor", i,":",aux
+                #print "rotor:", i, "resultado:", aux
+                #print " "
 
         return aux
 
@@ -109,12 +121,15 @@ class enigma:
         #print aux
 
         self.rotors[0].rot()
+        self.rotors[0].minuslist()
         flag = self.rotors[0].stepNext()
 
-        for i in range(1,len(self.rotors)):
-            if flag == True:
-                self.rotors[i].rot()
-                flag = self.rotors[i].stepNext()
+        if len(self.rotors) > 1:
+            for i in range(1,len(self.rotors)):
+                if flag == True:
+                    self.rotors[i].rot()
+                    self.rotors[i].minuslist()
+                    flag = self.rotors[i].stepNext()
 
         return aux
 
@@ -142,19 +157,55 @@ class enigma:
         return aux
 
 """
+
+"""
 segredo1 = createRandomVector(S)
 segredo2 = createRandomVector(S)
 segredo3 = createRandomVector(S)
+"""
+
+"""
+segredo1 = [5, 8, 0, 3, 7, 2, 6, 1, 4, 9]
+segredo2 = [6, 5, 3, 7, 4, 8, 1, 2, 9, 0]
+segredo3 = [7, 4, 1, 0, 2, 5, 3, 6, 9, 8]
+
+
+
 
 print 'segredo1:',segredo1
 print 'segredo2:',segredo2
 print 'segredo3:',segredo3
 # 5,3 e 4 Sao os deslocamentos iniciais.. fazem parte da chave
 
+"""
+
+"""
+
 e = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
 d = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
+"""
 
+"""
+segredo: [4, 2, 8, 0, 6, 5, 3, 1, 7, 9]
 
+texto claro = [0,0,0,0,0....]
+
+Texto cifrado:
+
+[4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0]
+"""
+
+segredo = [4, 2, 8, 0, 6, 5, 3, 1, 7, 9]
+
+e = enigma( [(segredo,0)] )
+d = enigma( [(segredo,0)] )
+
+"""
+
+e = enigma ( [ (segredo3,4),(segredo2,2),(segredo1,5)])
+d = enigma ( [ (segredo3,4),(segredo2,2),(segredo1,5)])
+
+"""
 
 '''
 for k in range(5):
@@ -175,9 +226,17 @@ for i in range(S):
 
 '''
 
-#p=[99]*100
+"""
+for k in range(5):
+    for i in range(S):
+        x = e.ecifra(i)
+        y = d.edecifra(x)
+        #assert i==y
 
-p = [i for i in range(100)]
+"""
+p=[0]*100
+
+#p = [i for i in range(100)]
 
 
 c=[e.ecifra(_p) for _p in p]
