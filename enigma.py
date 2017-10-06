@@ -10,23 +10,21 @@ def createRandomVector(n):
 
 
 def myindex(k,l, element):
-    #print "valor de k:",k
     length = len(l)
     count = 0
     for i in range(length):
         if element == l[(k+i)%length]:
             return count
         count = count + 1
-        #print "valor de cout:",count
-        #print "valor comparado:",l[(k+i)%length]
 
 
 
 class rotor:
 
-    def __init__(self,r,starting_position):
-        self.r = r
-        self.starting_position = starting_position
+    def __init__(self,r,desloc):
+        self.r = r[:]
+        self.desloc = desloc
+        self.starting_position = 0
         self.count = 0
         self.flag = False
 
@@ -34,23 +32,25 @@ class rotor:
         assert x >= 0
         assert x < len(self.r)
         assert x < S
+        #print self.r
         return self.r[(self.starting_position+x)%len(self.r)]
 
     def decifra(self,x):
         assert x >= 0
         assert x < len(self.r)
         assert x < S
+        #print self.r
         return myindex(self.starting_position,self.r,x)
-        #return (self.r.index(x) + (len(self.r) - self.starting_position))
 
     # Anda uma casa. o "primeiro" elemento vai para o fim
     def rot(self):
         self.starting_position = (self.starting_position + 1)%len(self.r)
-        self.count = (self.count + 1)%len(self.r)
-        #print self.count
+        self.count = self.count + 1
+        print "count" ,self.count, "len (self.r) ", len(self.r)
         #print self.r
-        if(self.count == len(self.r)):
+        if(self.count >= len(self.r)):
             self.flag = True
+            self.count = self.count%len(self.r) 
 
 
     # Responde se eu acabei de completar um ciclo. Se SIM, a rotacao deve ser propagada
@@ -87,25 +87,18 @@ class enigma:
         self.rotors[0].rot()
         self.rotors[0].minuslist()
         flag = self.rotors[0].stepNext()
-        #print " "
-        #print self.rotors[0].r
-        #print "cifra rotor 0: ", aux
+
+       #print "rotor 0:",aux
 
         if len(self.rotors) > 1:
             for i in range(1,len(self.rotors)):
-                #print self.rotors[i].r
-
                 if flag == True:
-                    #print "passou"
                     self.rotors[i].rot()
                     self.rotors[i].minuslist()
                     flag = self.rotors[i].stepNext()
 
-                #print "rotor:", i, "entrada:", aux
                 aux = self.rotors[i].cifra(aux)
-                #print "cifra rotor", i,":",aux
-                #print "rotor:", i, "resultado:", aux
-                #print " "
+                #print "rotor ",i,":",aux
 
         return aux
 
@@ -115,10 +108,9 @@ class enigma:
         aux = x
 
         for i in range(len(self.rotors)-1,-1,-1):
-            #print "passou",i
             aux = self.rotors[i].decifra(aux)
 
-        #print aux
+            #print "rotor",i,":",aux
 
         self.rotors[0].rot()
         self.rotors[0].minuslist()
@@ -133,30 +125,26 @@ class enigma:
 
         return aux
 
-"""
-    def edecifra(self,x):
-        print " "
-        print len(self.rotors)-1
-        print self.rotors[len(self.rotors)-1].starting_position
-        aux = self.rotors[len(self.rotors)-1].decifra(x)
-        print aux
-        flag = self.rotors[len(self.rotors)-1].stepNext()
-        #self.rotors[len(self.rotors)-1].rot()
-        print self.rotors[len(self.rotors)-1].r
-        print "cifra rotor",len(self.rotors)-1,":", aux
-        for i in range(1,len(self.rotors)):
-            print self.rotors[len(self.rotors)-1 - i].r
-            if flag == True:
-                print "AAaAAAAAAAAAAAAAAAAAAAAAA"
-                self.rotors[len(self.rotors) - 1 - i].rot()
-                flag = self.rotors[len(self.rotors)- 1 - i].stepNext()
+    def prepara(self):
 
-            aux = self.rotors[len(self.rotors)- 1 - i].decifra(aux)
-            print "cifra rotor",len(self.rotors)- 1 - i,":",aux
+        for i in range(len(self.rotors)):
+            #print self.rotors[i].r
+            for j in range(self.rotors[i].desloc):
+                self.rotors[i].rot()
+                self.rotors[i].minuslist()
+                flag = self.rotors[i].stepNext()
 
-        return aux
-
-"""
+                if i < len(self.rotors)-1:
+                    for k in range(i+1,len(self.rotors)):
+                        if flag == True:
+                            self.rotors[i].rot()
+                            self.rotors[i].minuslist()
+                            flag = self.rotors[i].stepNext()
+        '''       
+        print "Rotores"
+        for i in self.rotors:
+            print i.r
+        '''
 
 """
 segredo1 = createRandomVector(S)
@@ -165,12 +153,22 @@ segredo3 = createRandomVector(S)
 """
 
 """
+
 segredo1 = [5, 8, 0, 3, 7, 2, 6, 1, 4, 9]
 segredo2 = [6, 5, 3, 7, 4, 8, 1, 2, 9, 0]
 segredo3 = [7, 4, 1, 0, 2, 5, 3, 6, 9, 8]
 
+"""
+
+"""
+
+segredo21 = [5, 8, 0, 3, 7, 2, 6, 1, 4, 9]
+segredo22 = [6, 5, 3, 7, 4, 8, 1, 2, 9, 0]
+segredo23 = [7, 4, 1, 0, 2, 5, 3, 6, 9, 8]
+"""
 
 
+"""
 
 print 'segredo1:',segredo1
 print 'segredo2:',segredo2
@@ -179,11 +177,22 @@ print 'segredo3:',segredo3
 
 """
 
+
 """
 
 e = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
 d = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
+
+e.prepara()
+d.prepara()
+
 """
+
+"""
+e = enigma ( [ (segredo3,5),(segredo2,3),(segredo1,4)])
+d = enigma ( [ (segredo23,5),(segredo22,3),(segredo21,4)])
+"""
+
 
 """
 segredo: [4, 2, 8, 0, 6, 5, 3, 1, 7, 9]
@@ -194,16 +203,21 @@ Texto cifrado:
 
 [4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0, 4, 1, 6, 7, 2, 0, 7, 4, 9, 0]
 """
+"""
 
 segredo = [4, 2, 8, 0, 6, 5, 3, 1, 7, 9]
+segredo1 = [4, 2, 8, 0, 6, 5, 3, 1, 7, 9]
 
 e = enigma( [(segredo,0)] )
-d = enigma( [(segredo,0)] )
+d = enigma( [(segredo1,0)] )
 
 """
 
-e = enigma ( [ (segredo3,4),(segredo2,2),(segredo1,5)])
-d = enigma ( [ (segredo3,4),(segredo2,2),(segredo1,5)])
+
+
+"""
+e = enigma ( [ (segredo3,4),(segredo2,3),(segredo1,5)])
+d = enigma ( [ (segredo3,4),(segredo2,3),(segredo1,5)])
 
 """
 
@@ -225,15 +239,99 @@ for i in range(S):
         print i.starting_position
 
 '''
+"""
+Enigma minimo: disco unico
+segredo: [9, 0, 6, 5, 4, 7, 2, 3, 8, 1]
+Texto Claro: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+[9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2, 9, 9, 4, 2, 0, 2, 6, 6, 0, 2]
+
+"""
+"""
+segredo = [9, 0, 6, 5, 4, 7, 2, 3, 8, 1]
+segredo1 = [9, 0, 6, 5, 4, 7, 2, 3, 8, 1]
+
+
+e = enigma( [(segredo,0)] )
+d = enigma( [(segredo1,0)] )
+
+"""
+
+"""
+Enigma minimo: disco unico, rotacao inicial de 3
+segredo: [3, 2, 5, 0, 4, 6, 9, 7, 8, 1]
+Texto Claro: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+[7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3, 7, 0, 1, 3, 0, 0, 2, 3, 1, 3]
+
+"""
+"""
+segredo = [3, 2, 5, 0, 4, 6, 9, 7, 8, 1]
+segredo1 = [3, 2, 5, 0, 4, 6, 9, 7, 8, 1]
+
+e = enigma( [(segredo,3)] )
+d = enigma( [(segredo,3)] )
+
+e.prepara()
+d.prepara()
+"""
 
 """
 for k in range(5):
     for i in range(S):
         x = e.ecifra(i)
         y = d.edecifra(x)
-        #assert i==y
+        print "passou"
+        assert i==y
 
 """
+
+
+"""
+segredo = [4, 6, 0, 1, 7, 5, 2, 8, 9, 3]
+segredo1 = [4, 6, 0, 1, 7, 5, 2, 8, 9, 3]
+
+e = enigma( [(segredo,3)] )
+d = enigma( [(segredo1,3)] )
+p = [ i for i in range(4,0,-1)]
+
+c = [e.ecifra(_p) for _p in p]
+
+print c
+
+print [d.edecifra(_c) for _c in c]
+
+
+"""
+'''
+
+#testadoOK
+segredo1 = [5, 6, 1, 8, 2, 0, 7, 3, 4, 9]
+segredo2 = [9, 3, 8, 5, 0, 6, 1, 2, 4, 7]
+segredo3 = [7, 9, 5, 8, 0, 1, 2, 4, 3, 6]
+
+e = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
+d = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
+
+e.prepara()
+d.prepara()
+
+p = [i for i in range(5)]
+'''
+
+"""
+segredo1 = [2, 8, 7, 5, 9, 3, 1, 0, 4, 6]
+segredo2 = [0, 4, 7, 3, 8, 9, 2, 1, 5, 6]
+segredo3 = [7, 9, 4, 3, 8, 2, 1, 0, 5, 6]
+
+
+e = enigma ( [ (segredo1,4),(segredo2,3),(segredo3,5)])
+d = enigma ( [ (segredo1,4),(segredo2,3),(segredo3,5)])
+
+e.prepara()
+d.prepara()
+"""
+'''
 p=[0]*100
 
 #p = [i for i in range(100)]
@@ -244,8 +342,43 @@ c=[e.ecifra(_p) for _p in p]
 print c
 
 print [d.edecifra(_c) for _c in c]
+'''
+'''
+segredo1 =  createRandomVector(S)
+segredo2 =  createRandomVector(S)
+segredo3 =  createRandomVector(S)
+'''
+
+segredo1 = [5, 8, 0, 3, 7, 2, 6, 1, 4, 9]
+segredo2 = [6, 5, 3, 7, 4, 8, 1, 2, 9, 0]
+segredo3 = [7, 4, 1, 0, 2, 5, 3, 6, 9, 8]
+
+print 'segredo1:',segredo1
+print 'segredo2:',segredo2
+print 'segredo3:',segredo3
+# 5,3 e 4 Sao os deslocamentos iniciais.. fazem parte da chave
+e = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
+d = enigma ( [ (segredo1,5),(segredo2,3),(segredo3,4)])
 
 
+e.prepara()
+d.prepara()
+
+
+for k in range(5):
+    for i in range(S):
+        x = e.ecifra(i)
+        y = d.edecifra(x)
+        #assert i==y
+
+
+p=[0]*100
+
+c=[e.ecifra(_p) for _p in p]
+
+print c
+
+print [d.edecifra(_c) for _c in c]
 
 
 
